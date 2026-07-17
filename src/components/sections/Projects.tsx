@@ -19,7 +19,12 @@ function ProjectCard({ project }: { project: Project }) {
         {project.description}
       </p>
 
-      <ul className="mt-5 flex flex-wrap gap-2" aria-label="Tecnologie">
+      {/* Label unica per card: più liste "Tecnologie" identiche confonderebbero
+          l'elenco landmark/liste degli screen reader. */}
+      <ul
+        className="mt-5 flex flex-wrap gap-2"
+        aria-label={`Tecnologie di ${project.title}`}
+      >
         {project.stack.map((tech) => (
           <li
             key={tech}
@@ -37,10 +42,13 @@ function ProjectCard({ project }: { project: Project }) {
               href={project.repoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-sm font-medium text-zinc-300 underline-offset-4 transition-colors hover:text-violet-300 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-400"
+              className="tap-target rounded-sm font-medium text-zinc-300 underline-offset-4 transition-colors hover:text-violet-300 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-400"
             >
               Repository
-              <span className="sr-only"> di {project.title} (GitHub)</span>
+              <span className="sr-only">
+                {" "}
+                di {project.title} (GitHub, si apre in una nuova scheda)
+              </span>
             </a>
           ) : null}
           {project.demoUrl ? (
@@ -48,10 +56,13 @@ function ProjectCard({ project }: { project: Project }) {
               href={project.demoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-sm font-medium text-zinc-300 underline-offset-4 transition-colors hover:text-cyan-300 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-400"
+              className="tap-target rounded-sm font-medium text-zinc-300 underline-offset-4 transition-colors hover:text-cyan-300 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-400"
             >
               Demo live
-              <span className="sr-only"> di {project.title}</span>
+              <span className="sr-only">
+                {" "}
+                di {project.title} (si apre in una nuova scheda)
+              </span>
             </a>
           ) : null}
         </div>

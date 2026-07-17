@@ -25,13 +25,14 @@ export function Contact() {
             className="inline-flex items-center justify-center rounded-full border border-violet-400/40 bg-violet-500/10 px-6 py-3 text-sm font-semibold text-violet-200 transition-[color,background-color,border-color,box-shadow,translate] duration-200 ease-out hover:border-violet-300/60 hover:bg-violet-500/20 hover:shadow-lg hover:shadow-violet-500/15 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-400 motion-safe:hover:-translate-y-0.5"
           >
             GitHub — SonoKarol
+            <span className="sr-only"> (si apre in una nuova scheda)</span>
           </a>
         </div>
         <p className="text-sm text-zinc-400">
           Oppure copia l&apos;indirizzo:{" "}
           <a
             href={`mailto:${CONTACT_EMAIL}`}
-            className="rounded-sm font-mono text-zinc-300 underline-offset-4 transition-colors hover:text-cyan-300 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-400"
+            className="tap-target rounded-sm font-mono text-zinc-300 underline-offset-4 transition-colors hover:text-cyan-300 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet-400"
           >
             {CONTACT_EMAIL}
           </a>

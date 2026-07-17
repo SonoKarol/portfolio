@@ -62,6 +62,19 @@ export default function Scene({ eventSource }: SceneProps) {
         camera={{ position: [0, 0, 4.2], fov: 45, near: 0.1, far: 30 }}
         gl={{
           antialias: false,
+          // Il framebuffer di default riceve solo la copia finale del
+          // composer (quad screen-space): depth e stencil del canvas non
+          // servono a nulla — il depth test avviene nei render target del
+          // composer. Disattivarli risparmia memoria GPU e banda su mobile.
+          // INVARIANTE: vale solo finché il composer renderizza davvero la
+          // scena. Si rompe non solo rimuovendo <Effects/>, ma anche con
+          // EffectComposer enabled={false} o con <Effects/> smontata/senza
+          // effect: in quei casi R3F/RenderPass disegnano la scena
+          // direttamente sul canvas SENZA depth buffer → blob corrotto
+          // (facce che si compenetrano). Se mai si disabilita il composer,
+          // ripristinare depth: true (e valutare stencil).
+          stencil: false,
+          depth: false,
           powerPreference: "high-performance",
         }}
         eventSource={eventSource}

@@ -16,6 +16,11 @@
 :root {
   --background: #08060f;
   --foreground: #ededed;
+  /*
+   * Sito dark-first: dichiararlo alla UA allinea scrollbar, caret e
+   * controlli nativi al tema scuro (evita scrollbar chiare su Windows).
+   */
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -107,6 +112,39 @@ body {
  * (senza, la sottolineatura appare comunque, solo istantanea).
  */
 @layer components {
+  /*
+   * ─── Target touch minimi (accessibilità) ──────────────────────────────────
+   * Estende l'area tappabile dei link testuali piccoli (navbar, footer, link
+   * inline) a un minimo di 44×44px — sopra il minimo AA di WCAG 2.5.8 (24px)
+   * e in linea con le linee guida touch iOS/Android — senza alterare il
+   * layout: pseudo-elemento assoluto centrato sul link.
+   *
+   * SOLO `pointer: coarse` (fix review Fase 4): con il mouse il pseudo-
+   * elemento coprirebbe il testo bloccando selezione/doppio click (critico
+   * per l'email in Contact.tsx, dove il copy invita a copiare l'indirizzo);
+   * su desktop di precisione il minimo 44px non serve.
+   *
+   * Sovrapposizioni: ricadono solo su testo non interattivo o su gap ≥
+   * dell'espansione nei layout standard di footer/card/inline. Eccezione
+   * nota e accettata: navbar sotto ~330px al wrap della <ul> — vedi il
+   * commento in src/components/layout/Navbar.tsx.
+   */
+  .tap-target {
+    position: relative;
+  }
+
+  @media (pointer: coarse) {
+    .tap-target::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: max(100%, 2.75rem);
+      height: max(100%, 2.75rem);
+      transform: translate(-50%, -50%);
+    }
+  }
+
   .link-underline {
     position: relative;
   }

@@ -12,7 +12,7 @@ export default function Home() {
       {/* Skip link: primo elemento focusabile, visibile solo da tastiera */}
       <a
         href="#contenuto"
-        className="sr-only z-[60] rounded-md bg-zinc-50 text-sm font-medium text-zinc-900 focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:px-4 focus:py-2"
+        className="sr-only z-[60] rounded-md bg-zinc-50 text-sm font-medium text-zinc-900 focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:px-4 focus:py-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400"
       >
         Vai al contenuto
       </a>

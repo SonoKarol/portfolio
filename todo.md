@@ -10,7 +10,7 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto · `(owner)` subagent re
 - [x] Permessi in `.claude/settings.json`
 - [x] Bootstrap Next.js + TypeScript + Tailwind (`create-next-app`) (frontend-developer)
 - [x] Aggiungere `.gitignore` e configurare TypeScript strict (frontend-developer)
-- [~] `git init`, primo commit, creare repo GitHub `portfolio` e push (github-deploy)
+- [x] `git init`, primo commit, creare repo GitHub `portfolio` e push (github-deploy)
 - [ ] Collegare il repo a Vercel per deploy automatico (github-deploy)
 
 ## Fase 1 — Fondamenta 3D

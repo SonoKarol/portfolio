@@ -17,7 +17,7 @@ export default function Home() {
         Vai al contenuto
       </a>
       <Navbar />
-      <main id="contenuto" className="flex min-h-svh flex-col bg-[#08060f]">
+      <main id="contenuto" className="flex min-h-svh flex-col bg-surface">
         <Hero />
         <About />
         <Projects />

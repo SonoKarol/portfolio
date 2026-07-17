@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
+import { interaction } from "./InteractionTracker";
 
 /**
  * Campo di particelle procedurale attorno all'oggetto hero.
@@ -86,6 +87,7 @@ const uniforms: ParticlesUniforms = {
 };
 
 export function Particles() {
+  const pointsRef = useRef<THREE.Points>(null);
   const dpr = useThree((state) => state.viewport.dpr);
 
   const { positions, scales, seeds } = useMemo(() => {
@@ -108,12 +110,21 @@ export function Particles() {
   }, []);
 
   useFrame((_, delta) => {
-    uniforms.uTime.value += delta;
+    // Clamp del delta (vedi HeroObject): niente salti dopo pause del frameloop.
+    uniforms.uTime.value += Math.min(delta, 0.1);
     uniforms.uPixelRatio.value = dpr;
+
+    // Parallasse di scroll: il campo sale più lentamente della pagina mentre
+    // l'hero esce dal viewport (scrub diretto sul progresso, già smorzato
+    // dallo scroll nativo; nessuna lettura layout qui — vedi InteractionTracker).
+    const points = pointsRef.current;
+    if (points) {
+      points.position.y = interaction.scroll * 1.6;
+    }
   });
 
   return (
-    <points>
+    <points ref={pointsRef}>
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
         <bufferAttribute attach="attributes-aScale" args={[scales, 1]} />

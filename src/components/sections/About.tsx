@@ -3,7 +3,7 @@ import { Section } from "@/components/ui/Section";
 export function About() {
   return (
     <Section id="chi-sono" title="Chi sono">
-      <div className="max-w-2xl space-y-5 text-base leading-relaxed text-zinc-300 sm:text-lg">
+      <div className="max-w-2xl space-y-5 text-base leading-relaxed text-pretty text-zinc-300 sm:text-lg">
         <p>
           Ciao, sono Karol: un creative developer. Costruisco esperienze web
           che uniscono codice, design e 3D in tempo reale — siti che non si

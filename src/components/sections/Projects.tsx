@@ -3,9 +3,11 @@ import { projects, type Project } from "@/lib/projects";
 
 function ProjectCard({ project }: { project: Project }) {
   return (
-    <article className="group flex h-full flex-col rounded-xl border border-white/10 bg-white/[0.03] p-6 transition-colors duration-200 hover:border-violet-400/40 hover:bg-white/[0.05] focus-within:border-violet-400/40">
+    <article className="group flex h-full flex-col rounded-card border border-white/10 bg-white/[0.03] p-6 transition-[color,background-color,border-color,box-shadow,translate] duration-300 ease-out hover:border-violet-400/40 hover:bg-white/[0.05] hover:shadow-lg hover:shadow-violet-500/10 focus-within:border-violet-400/40 motion-safe:hover:-translate-y-1">
       <div className="flex items-start justify-between gap-3">
-        <h3 className="text-lg font-semibold text-zinc-50">{project.title}</h3>
+        <h3 className="text-lg font-semibold tracking-tight text-zinc-50">
+          {project.title}
+        </h3>
         {project.placeholder ? (
           <span className="shrink-0 rounded-full border border-cyan-400/30 px-2.5 py-0.5 text-[11px] font-medium text-cyan-300">
             In arrivo

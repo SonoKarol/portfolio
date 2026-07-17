@@ -12,9 +12,9 @@ export function Skills() {
         {skillGroups.map((group) => (
           <div
             key={group.title}
-            className="rounded-xl border border-white/10 bg-white/[0.03] p-5"
+            className="rounded-card border border-white/10 bg-white/[0.03] p-5 transition-colors duration-300 ease-out hover:border-white/20"
           >
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
+            <h3 className="text-xs font-semibold uppercase tracking-widest text-zinc-400">
               {group.title}
             </h3>
             <ul className="mt-4 flex flex-wrap gap-2">

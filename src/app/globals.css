@@ -1,6 +1,14 @@
 @import "tailwindcss";
 
 /*
+ * ─── Design token (direzione artistica) ─────────────────────────────────────
+ * Tailwind v4: niente tailwind.config, i token vivono qui dentro @theme.
+ *
+ * Palette (documentata in architecture.md §3):
+ *   - Neutri: scala `zinc` stock di Tailwind (testi 50/200/300/400 su surface).
+ *   - Accenti: scala `violet` (300–500) e `cyan` (300–400) stock; i due valori
+ *     "brand" qui sotto sono gli stessi usati dagli shader della scena 3D.
+ *
  * Sito dark-first: sfondo scuro fisso anche in light scheme, per evitare
  * flash bianchi (primo paint, overscroll iOS) dietro l'hero scuro.
  * Rivalutare quando/se arriverà il tema chiaro (backlog).
@@ -13,13 +21,32 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  /* Superficie base del sito (uguale allo sfondo della scena 3D). */
+  --color-surface: var(--background);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
+@theme {
+  /* Accenti brand = colori degli shader dell'hero (violet-500 / cyan-400). */
+  --color-brand-violet: #8b5cf6;
+  --color-brand-cyan: #22d3ee;
+
+  /*
+   * Offset per la navbar fissa (altezza max ~69px con wrap + margine).
+   * Usato come `scroll-mt-nav` in `src/components/ui/Section.tsx`; se cambi
+   * altezza/padding della navbar (`src/components/layout/Navbar.tsx`),
+   * aggiorna questo valore.
+   */
+  --spacing-nav: 5rem;
+
+  /* Raggio ricorrente delle card (Projects/Skills). */
+  --radius-card: 0.75rem;
+}
+
 /*
  * Smooth scroll per i link àncora della one-page, solo se l'utente non ha
- * chiesto di ridurre il movimento.
+ * chiesto di ridurre il movimento. Niente Lenis: vedi architecture.md §3.
  */
 @media (prefers-reduced-motion: no-preference) {
   html {
@@ -33,22 +60,103 @@ body {
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
+/* Selezione testo coerente con la palette (micro-dettaglio). */
+::selection {
+  background: color-mix(in srgb, var(--color-brand-violet) 45%, transparent);
+  color: #fafafa;
+}
+
+/*
+ * ─── Reveal delle sezioni allo scroll (CSS scroll-driven, zero JS) ──────────
+ * Fade + rise sottile scrubbing sull'ingresso in viewport.
+ * Progressive enhancement: senza supporto `animation-timeline` (o con
+ * prefers-reduced-motion) non succede nulla e il contenuto è sempre visibile.
+ * Le sezioni restano Server Component. Motivazione in architecture.md §3.
+ *
+ * NOTA: i keyframes animano `transform` (non `translate`) di proposito: il
+ * fill-mode `both` tiene l'ultimo keyframe applicato, e usando `transform`
+ * non entra in conflitto con le utility hover di Tailwind v4, che usano la
+ * proprietà `translate` (le due proprietà si compongono).
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation-name: reveal-rise;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 45%;
+    }
+  }
+}
+
+@keyframes reveal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * ─── Micro-interazione: sottolineatura gradiente su hover/focus ─────────────
+ * Per link di navigazione e footer. La transizione è gated su reduced-motion
+ * (senza, la sottolineatura appare comunque, solo istantanea).
+ */
+@layer components {
+  .link-underline {
+    position: relative;
+  }
+
+  .link-underline::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: -0.2em;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      var(--color-brand-violet),
+      var(--color-brand-cyan)
+    );
+    opacity: 0;
+    transform: scaleX(0.6);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .link-underline::after {
+      transition:
+        opacity 200ms ease-out,
+        transform 200ms ease-out;
+    }
+  }
+
+  .link-underline:hover::after,
+  .link-underline:focus-visible::after {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
 /*
  * Fallback statico dell'hero 3D: gradiente coerente con la palette della
- * scena (violet/cyan su near-black). Mostrato durante il lazy-load della
+ * scena (brand violet/cyan su surface). Mostrato durante il lazy-load della
  * scena, se WebGL non è disponibile o con prefers-reduced-motion attivo.
  */
 .hero-fallback {
   background:
     radial-gradient(
       60% 50% at 50% 45%,
-      rgba(139, 92, 246, 0.3),
+      color-mix(in srgb, var(--color-brand-violet) 30%, transparent),
       transparent 70%
     ),
     radial-gradient(
       40% 35% at 62% 58%,
-      rgba(34, 211, 238, 0.14),
+      color-mix(in srgb, var(--color-brand-cyan) 14%, transparent),
       transparent 70%
     ),
-    #08060f;
+    var(--background);
 }

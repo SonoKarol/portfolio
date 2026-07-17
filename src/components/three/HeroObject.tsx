@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import { interaction } from "./InteractionTracker";
 
 /**
  * Icosaedro ad alta tassellazione deformato da simplex noise nel vertex
@@ -127,6 +128,8 @@ const fragmentShader = /* glsl */ `
   uniform vec3 uColorA;
   uniform vec3 uColorB;
   uniform vec3 uColorRim;
+  uniform vec3 uBackground;
+  uniform float uScroll;
 
   varying vec3 vNormal;
   varying vec3 vViewDir;
@@ -147,6 +150,16 @@ const fragmentShader = /* glsl */ `
     // Il rim supera la soglia di luminanza del bloom: alone morbido sul bordo.
     color += uColorRim * fresnel * 1.4;
 
+    // Dissolvenza di scroll: mentre l'hero esce dal viewport il blob sfuma
+    // verso il colore di sfondo. Il target arriva come uniform THREE.Color
+    // (#08060f, in sync con lo sfondo scena in Experience.tsx): la conversione
+    // sRGB→linear la fa THREE.Color, così dopo la ricodifica in output del
+    // composer la dissolvenza converge davvero allo sfondo (un vec3 hardcoded
+    // in sRGB verrebbe trattato come linear → silhouette residua chiara).
+    // Spegne anche il rim, quindi il bloom scende sotto soglia e si dissolve
+    // insieme al resto.
+    color = mix(color, uBackground, uScroll);
+
     gl_FragColor = vec4(color, 1.0);
   }
 `;
@@ -154,9 +167,11 @@ const fragmentShader = /* glsl */ `
 type HeroUniforms = {
   uTime: THREE.IUniform<number>;
   uIntensity: THREE.IUniform<number>;
+  uScroll: THREE.IUniform<number>;
   uColorA: THREE.IUniform<THREE.Color>;
   uColorB: THREE.IUniform<THREE.Color>;
   uColorRim: THREE.IUniform<THREE.Color>;
+  uBackground: THREE.IUniform<THREE.Color>;
 };
 
 const BASE_INTENSITY = 0.32;
@@ -169,9 +184,13 @@ const HOVER_INTENSITY = 0.5;
 const uniforms: HeroUniforms = {
   uTime: { value: 0 },
   uIntensity: { value: BASE_INTENSITY },
+  uScroll: { value: 0 },
   uColorA: { value: new THREE.Color("#3b1d8f") },
   uColorB: { value: new THREE.Color("#22d3ee") },
   uColorRim: { value: new THREE.Color("#a78bfa") },
+  // Stesso valore dello sfondo scena (<color attach="background"> in
+  // Experience.tsx) e di --color-surface: tenere in sync.
+  uBackground: { value: new THREE.Color("#08060f") },
 };
 
 export function HeroObject() {
@@ -181,27 +200,51 @@ export function HeroObject() {
     const mesh = meshRef.current;
     if (!mesh) return;
 
-    uniforms.uTime.value += delta;
+    // Clamp del delta: evita salti di animazione al primo frame dopo la
+    // pausa del frameloop (hero fuori viewport) o dopo un tab in background.
+    const dt = Math.min(delta, 0.1);
+    const s = interaction.scroll;
+
+    uniforms.uTime.value += dt;
+    // Dissolvenza verso lo sfondo con easing quadratico: parte piano, si
+    // completa quasi del tutto quando l'hero è fuori viewport.
+    uniforms.uScroll.value = s * s * 0.9;
+
+    // Decadimento esponenziale dell'impulso da tap/click (unico writer).
+    interaction.pulse *= Math.exp(-2.8 * dt);
 
     // Boost di distorsione quando il puntatore è vicino al centro dello
     // schermo: niente raycast (costoso su mesh dense), solo distanza in NDC.
+    // Su touch (coarse) il puntatore resta all'ultimo tap → si ignora e
+    // l'interazione equivalente è l'impulso qui sotto.
     const pointerDist = Math.hypot(state.pointer.x, state.pointer.y);
-    const target = pointerDist < 0.4 ? HOVER_INTENSITY : BASE_INTENSITY;
+    const hoverBoost =
+      !interaction.coarse && pointerDist < 0.4
+        ? HOVER_INTENSITY - BASE_INTENSITY
+        : 0;
+    const target = BASE_INTENSITY + hoverBoost + interaction.pulse * 0.55;
+    // Attack rapido (il tap deve rispondere subito), release morbido.
+    const lambda = target > uniforms.uIntensity.value ? 6 : 2.5;
     uniforms.uIntensity.value = THREE.MathUtils.damp(
       uniforms.uIntensity.value,
       target,
-      2.5,
-      delta,
+      lambda,
+      dt,
     );
 
-    // Rotazione lenta continua + inclinazione smorzata verso il puntatore.
-    mesh.rotation.y += delta * 0.12;
+    // Rotazione lenta continua, accelerata dallo scroll; inclinazione smorzata
+    // verso il puntatore (solo pointer fine) + tilt legato allo scroll.
+    mesh.rotation.y += dt * (0.12 + s * 0.45);
+    const pointerTilt = interaction.coarse ? 0 : state.pointer.y * -0.25;
     mesh.rotation.x = THREE.MathUtils.damp(
       mesh.rotation.x,
-      state.pointer.y * -0.25,
+      pointerTilt * (1 - s) + s * 0.55,
       2,
-      delta,
+      dt,
     );
+
+    // Il blob si ritira mentre l'hero esce (insieme al dolly-out della camera).
+    mesh.scale.setScalar(1 - 0.28 * s);
   });
 
   return (

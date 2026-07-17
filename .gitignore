@@ -27,6 +27,12 @@ Thumbs.db
 # 3D asset cache
 *.blend1
 
+# documentazione e configurazione interna di lavoro (solo locale, non pubblicata)
+CLAUDE.md
+.claude/
+architecture.md
+todo.md
+
 # next.js generated
 next-env.d.ts
 *.tsbuildinfo

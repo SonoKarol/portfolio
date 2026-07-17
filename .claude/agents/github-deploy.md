@@ -19,3 +19,7 @@ Regole di sicurezza:
 - Non fare `git push --force` sul branch principale.
 - Verifica sempre che il deploy sia andato a buon fine e riporta l'URL.
 - Aggiorna todo.md; registra scelte di deploy in architecture.md.
+
+# Da applicare SEMPRE
+Su github non deve esserci mai traccia di claude come co-author, ne' tracce di aiuti di claude nella repo.
+Inserire tutti i file potenzialmente riconducibili a claude nel .gitignore.

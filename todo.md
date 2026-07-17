@@ -21,12 +21,13 @@ Legenda: `[ ]` da fare · `[~]` in corso · `[x]` fatto · `(owner)` subagent re
 - Nota: review code-reviewer completata in 2 pass (7 finding, tutti risolti e ri-verificati); resta consigliata una verifica visiva del tuning bloom/particelle con `npm run dev`
 
 ## Fase 2 — Struttura sito e contenuti
-- [ ] Layout one-page con navbar e sezioni ancora (frontend-developer)
-- [ ] Sezione Hero (con la scena 3D integrata) (frontend-developer + threejs-specialist)
-- [ ] Sezione Chi sono (frontend-developer)
-- [ ] Sezione Progetti (dati da `src/lib/projects.ts`) (frontend-developer)
-- [ ] Sezione Competenze (frontend-developer)
-- [ ] Sezione Contatti (form/mailto + link social) (frontend-developer)
+- [x] Layout one-page con navbar e sezioni ancora (frontend-developer) — Navbar fissa + Footer in `src/components/layout/`, smooth scroll CSS con rispetto reduced-motion, skip link, wrapper `Section` riutilizzabile in `src/components/ui/`; review passata
+- [x] Sezione Hero (con la scena 3D integrata) (frontend-developer + threejs-specialist) — id àncora, CTA "Scopri i progetti" con `pointer-events-auto` (fix del finding Fase 1); scena 3D non toccata; review passata
+- [x] Sezione Chi sono (frontend-developer) — `About.tsx`, bio placeholder senza fatti inventati; review passata
+- [x] Sezione Progetti (dati da `src/lib/projects.ts`) (frontend-developer) — interfaccia `Project` tipizzata, 3 card (portfolio reale + 2 segnaposto "In arrivo") con hover state; review passata
+- [x] Sezione Competenze (frontend-developer) — dati tipizzati in `src/lib/skills.ts`, griglia 4 gruppi; review passata
+- [x] Sezione Contatti (form/mailto + link social) (frontend-developer) — mailto verso bonfiglio.karol.p@gmail.com + link GitHub SonoKarol (costanti in `src/lib/site.ts`), niente form/backend; review passata
+- Nota: review code-reviewer completata in 2 pass (2 finding importanti + 3 minori, risolti e ri-verificati); resta aperto solo il follow-up parallasse/`eventSource` per threejs-specialist (Fase 3)
 
 ## Fase 3 — Direzione artistica e motion
 - [ ] Palette, tipografia, design tokens in Tailwind (design-director)
@@ -56,3 +57,11 @@ Review completata: nessun problema bloccante; build e lint passano; lazy-load de
 - [x] `src/components/three/effects/Effects.tsx`: `luminanceThreshold={0.25}` non è "soglia alta": il bloom si accende anche sulla faccia illuminata del blob, non solo sul rim; alzare (~0.6) o correggere commento/architecture.md (threejs-specialist)
 - [x] `HeroObject.tsx` / `Particles.tsx`: in `useFrame` usare l'oggetto `uniforms` memoizzato invece del cast `material.uniforms as ...` (threejs-specialist)
 - [ ] npm audit: 2 moderate transitive (postcss <8.5.10 dentro next) — non azionabile ora, aggiornare Next alla prossima patch (github-deploy)
+
+## Follow-up review Fase 2 (code-reviewer, 2026-07-17)
+Review completata: nessun problema bloccante; build e lint passano; sezioni tutte Server Component (nessun "use client" oltre all'hero), zero JS client aggiunto, nessuna nuova dipendenza. Da sistemare:
+- [x] Contrasto `text-zinc-500` (#71717b) su #08060f = 4.17:1, sotto il minimo AA 4.5:1 per testo normale → passare a `text-zinc-400` (7.7:1): `src/components/layout/Footer.tsx:6` e `src/components/sections/Contact.tsx:30` (frontend-developer) — fatto in entrambi i file
+- [x] Skip link in `src/app/page.tsx`: al focus `focus:not-sr-only` azzera il padding (specificità maggiore di `px-4 py-2`, verificato nel CSS compilato) → usare `focus:px-4 focus:py-2` (frontend-developer) — fatto
+- [ ] Parallasse hero: il puntatore R3F si congela sull'hover della CTA (eventi solo sulla canvas). Accettabile ora; in Fase 3 valutare `eventSource` sulla sezione hero per continuità del rig (threejs-specialist)
+- [x] `scroll-mt-20` in `Section.tsx` accoppiato all'altezza della navbar fissa (~45px, ~69px con wrap): margine ok oggi, ma aggiungere commento incrociato Navbar↔Section o estrarre una variabile CSS condivisa (frontend-developer) — aggiunto commento incrociato in entrambi i file (variabile CSS condivisa rimandata a Fase 3 se la navbar cambierà)
+- [x] Anno "© 2026" hardcoded in `Footer.tsx:7` → `new Date().getFullYear()` a build time o nota di manutenzione (frontend-developer) — ora `new Date().getFullYear()`, valutato a build time (pagina statica)

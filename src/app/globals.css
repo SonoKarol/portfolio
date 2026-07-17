@@ -17,6 +17,16 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/*
+ * Smooth scroll per i link àncora della one-page, solo se l'utente non ha
+ * chiesto di ridurre il movimento.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

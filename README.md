@@ -1,36 +1,25 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Portfolio
 
-## Getting Started
+Portfolio personale di Karol ([@SonoKarol](https://github.com/SonoKarol)): sito one-page con una scena 3D procedurale nell'hero (shader custom, particelle, post-processing), fallback statico e rispetto di `prefers-reduced-motion`.
 
-First, run the development server:
+La sezione Progetti mostra i repository pubblici di GitHub, aggiornati automaticamente (ISR, 1h) con fallback a dati locali.
+
+## Stack
+
+- [Next.js](https://nextjs.org) (App Router) + React + TypeScript strict
+- [Three.js](https://threejs.org) via react-three-fiber + @react-three/postprocessing
+- [Tailwind CSS](https://tailwindcss.com) v4
+- Deploy su [Vercel](https://vercel.com)
+
+## Sviluppo
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev     # server di sviluppo su http://localhost:3000
+npm run lint    # ESLint
+npm run build   # build di produzione
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Variabili d'ambiente
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `GITHUB_TOKEN` (facoltativo in locale, **consigliato in produzione**): token GitHub a sola lettura che alza il rate limit dell'API usata dalla sezione Progetti. In locale va in `.env.local`; su Vercel va impostato nelle Environment Variables del progetto, perché gli IP egress sono condivisi tra molti progetti e il limite anonimo (60 req/h per IP) può esaurirsi. Se una revalidation fallisce comunque, il sito continua a servire l'ultima versione buona (i dati reali non vengono mai sostituiti dal fallback a runtime).

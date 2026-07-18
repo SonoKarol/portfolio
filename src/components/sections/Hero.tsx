@@ -36,7 +36,14 @@ export function Hero() {
       ref={setSectionEl}
       id="hero"
       aria-labelledby="hero-titolo"
-      className="relative flex min-h-svh w-full items-center justify-center overflow-hidden"
+      /*
+       * `theme-dark-fixed`: l'hero è un'isola SEMPRE scura, anche col tema
+       * chiaro attivo — la scena 3D non è tematizzabile e la hero immersiva
+       * scura è una scelta di design (vedi globals.css/architecture.md).
+       * In light un gradiente CSS (::after) raccorda il bordo inferiore
+       * dell'hero al chiaro delle sezioni successive.
+       */
+      className="theme-dark-fixed relative flex min-h-svh w-full items-center justify-center overflow-hidden"
     >
       {/* Fallback statico: visibile durante il load, senza WebGL, con reduced motion */}
       <div aria-hidden="true" className="hero-fallback absolute inset-0" />

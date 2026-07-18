@@ -18,6 +18,16 @@ interface SectionProps {
  *
  * La classe `reveal` (globals.css) applica il fade+rise scroll-driven al
  * contenuto: puro CSS, nessun effetto senza supporto o con reduced-motion.
+ *
+ * `tabIndex={-1}`: arrivando da un link `next/link` verso `/#sezione` il
+ * router chiama `focus()` sull'elemento bersaglio; senza questo attributo la
+ * `<section>` non è focusabile e il focus resta all'inizio del documento (il
+ * Tab successivo riparte dalla navbar invece che dalla sezione). Con -1 la
+ * sezione è focusabile SOLO da programma: non entra nell'ordine di
+ * tabulazione, quindi nessun tab stop in più. `focus:outline-none` toglie
+ * solo l'outline del contenitore (che avvolgerebbe l'intera sezione senza
+ * dare informazione utile): riguarda esclusivamente questo elemento, i focus
+ * ring `focus-visible` di link e bottoni interni restano intatti.
  */
 export function Section({ id, title, intro, children, className }: SectionProps) {
   const headingId = `${id}-titolo`;
@@ -26,7 +36,8 @@ export function Section({ id, title, intro, children, className }: SectionProps)
     <section
       id={id}
       aria-labelledby={headingId}
-      className={`scroll-mt-nav px-4 py-20 sm:px-6 sm:py-28 ${className ?? ""}`}
+      tabIndex={-1}
+      className={`scroll-mt-nav px-4 py-20 focus:outline-none sm:px-6 sm:py-28 ${className ?? ""}`}
     >
       <div className="reveal mx-auto w-full max-w-5xl">
         <span

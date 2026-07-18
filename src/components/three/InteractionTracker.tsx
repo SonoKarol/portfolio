@@ -19,6 +19,13 @@ export const interaction = {
   pulse: 0,
   /** true su dispositivi con puntatore "coarse" (touch): niente parallasse da mouse. */
   coarse: false,
+  /**
+   * Hook audio opzionale (src/lib/audio.ts): impostato SOLO ad audio attivo
+   * (opt-in via AudioToggle), invocato quando un tap/click valido innesca il
+   * pulse — evento discreto, mai chiamato in useFrame. null = audio spento,
+   * zero costo (il modulo audio non è nemmeno caricato).
+   */
+  onPulse: null as (() => void) | null,
 };
 
 type InteractionTrackerProps = {
@@ -70,6 +77,7 @@ export function InteractionTracker({ heroEl }: InteractionTrackerProps) {
       const ndcY = -(event.clientY / window.innerHeight) * 2 + 1;
       if (Math.hypot(ndcX, ndcY) < 0.5) {
         interaction.pulse = Math.min(interaction.pulse + 1, 1.5);
+        interaction.onPulse?.();
       }
     };
 
